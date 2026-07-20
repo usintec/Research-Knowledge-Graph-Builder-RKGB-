@@ -1,0 +1,5 @@
+[project]
+name = "research-knowledge-graph-builder"
+version = "0.1.0"
+description = "Research Knowledge Graph Builder"
+requires-python = ">=3.11"

@@ -1,0 +1,5 @@
+version: "3.9"
+services:
+  app:
+    build: ./docker
+    container_name: research-kg-builder
