@@ -1,5 +1,83 @@
 version: "3.9"
+
+# ============================================================
+# RKGB — Development Docker Compose
+# Provides all infrastructure services for local development.
+# The Python application itself is run on the host via
+#   `make run` (hot-reload) or inside the app service below.
+# ============================================================
+
 services:
+  # ----------------------------------------------------------
+  # Application
+  # ----------------------------------------------------------
   app:
-    build: ./docker
-    container_name: research-kg-builder
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: rkgb-app
+    env_file: .env
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    volumes:
+      - .:/workspace
+    depends_on:
+      neo4j:
+        condition: service_healthy
+    networks:
+      - rkgb-net
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # ----------------------------------------------------------
+  # Neo4j
+  # ----------------------------------------------------------
+  neo4j:
+    image: neo4j:5.20-community
+    container_name: rkgb-neo4j
+    ports:
+      - "7474:7474"   # HTTP Browser
+      - "7687:7687"   # Bolt
+    environment:
+      NEO4J_AUTH: "neo4j/${NEO4J_PASSWORD:-devpassword}"
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_dbms_security_procedures_unrestricted: "apoc.*"
+    volumes:
+      - neo4j-data:/data
+      - neo4j-logs:/logs
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "${NEO4J_PASSWORD:-devpassword}", "RETURN 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    networks:
+      - rkgb-net
+
+  # ----------------------------------------------------------
+  # Redis (cache / session store)
+  # ----------------------------------------------------------
+  redis:
+    image: redis:7.2-alpine
+    container_name: rkgb-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rkgb-net
+
+# ----------------------------------------------------------
+# Networks & Volumes
+# ----------------------------------------------------------
+networks:
+  rkgb-net:
+    driver: bridge
+
+volumes:
+  neo4j-data:
+  neo4j-logs:
+  redis-data:

@@ -1,0 +1,24 @@
+# ============================================================
+# RKGB — Testing Configuration
+# Used by pytest and CI pipelines.
+# ============================================================
+
+app:
+  env: testing
+  debug: true
+  host: "127.0.0.1"
+  port: 8001
+
+logging:
+  level: WARNING
+  format: console
+
+neo4j:
+  uri: "bolt://localhost:7688"   # Separate test DB instance
+  database: rkgb_test
+
+storage:
+  backend: memory   # In-memory storage for tests
+
+cache:
+  backend: memory

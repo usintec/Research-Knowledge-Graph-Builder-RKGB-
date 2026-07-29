@@ -1,0 +1,686 @@
+# RKGB (Research Knowledge Graph Builder) — AI Engineering Implementation Prompt
+
+## Project Overview
+
+You are acting as a Senior Software Architect and Principal Python Engineer responsible for implementing an enterprise-grade AI platform called **Research Knowledge Graph Builder (RKGB)**.
+
+This is **not** a simple PDF parser or knowledge graph project.
+
+It is intended to become a modular AI platform capable of:
+
+* Managing research papers
+* Extracting scientific knowledge
+* Constructing semantic knowledge graphs
+* Performing GraphRAG
+* Powering autonomous research agents
+* Supporting ontology-driven AI
+* Serving as an AI infrastructure platform for research intelligence
+
+The software must be designed with long-term scalability in mind and should resemble the engineering quality of enterprise platforms such as LangChain, Airflow, Kubernetes, PyTorch, or Microsoft's Semantic Kernel.
+
+The project follows Clean Architecture, Domain-Driven Design (DDD), Vertical Slice Architecture, SOLID principles, CQRS-lite, and an Event-Driven architecture.
+
+Do **not** optimise for the smallest amount of code. Optimise for maintainability, extensibility, modularity, readability, and testability.
+
+---
+
+# Current Project Status
+
+The architecture and documentation have already been completed.
+
+The following architectural documents already exist conceptually and should guide implementation:
+
+Completed Architecture
+
+* System Architecture
+* Domain Model
+* Ontology Specification
+* Processing Engine
+* Pipeline Context
+* Pipeline Stage Contract
+* Pipeline Manager
+* Pipeline DSL
+* Stage Registry
+* Plugin Architecture
+* Repository Layer
+* Persistence Mapping Layer
+* Document Management Pipeline
+* CQRS-lite Application Layer
+* Application Layer Structure
+
+The architecture **must not be redesigned** unless implementation exposes a genuine engineering problem.
+
+Implementation should follow the architecture rather than replace it.
+
+---
+
+# Architectural Layers
+
+The system is composed of the following layers.
+
+```text
+Presentation Layer
+
+↓
+
+Processing Engine
+
+↓
+
+Application Layer (CQRS-lite)
+
+↓
+
+Domain Layer
+
+↓
+
+Repository Layer
+
+↓
+
+Infrastructure Layer
+```
+
+Responsibilities
+
+Presentation Layer
+
+* FastAPI
+* CLI
+* AI Agents
+* Scheduled Jobs
+* Kafka Consumers
+
+Processing Engine
+
+* Pipeline Manager
+* Execution Runtime
+* Pipeline DSL
+* Stage Registry
+* Plugin Loader
+
+Application Layer
+
+* Commands
+* Queries
+* Command Handlers
+* Query Handlers
+* DTOs
+* Policies
+* Results
+* Application Events
+
+Domain Layer
+
+* Entities
+* Value Objects
+* Aggregates
+* Domain Services
+* Repository Interfaces
+
+Infrastructure Layer
+
+* Neo4j
+* File Storage
+* Logging
+* Configuration
+* Event Bus
+* Docker
+* FastAPI
+* External APIs
+
+---
+
+# Business Capabilities (Application Features)
+
+Each business capability owns its own commands, queries, handlers, DTOs, policies and events.
+
+Capabilities include:
+
+* Document Management
+* Document Extraction
+* Knowledge Extraction
+* Entity Resolution
+* Ontology Mapping
+* Graph Construction
+* Graph Validation
+* Semantic Indexing
+* GraphRAG
+* Research Intelligence
+* Export
+* Maintenance
+
+Each capability corresponds closely to one processing pipeline.
+
+---
+
+# Processing Pipelines
+
+The platform consists of multiple independent pipelines.
+
+1. Document Management Pipeline
+2. Document Extraction Pipeline
+3. Knowledge Extraction Pipeline
+4. Entity Resolution Pipeline
+5. Ontology Mapping Pipeline
+6. Knowledge Graph Construction Pipeline
+7. Graph Validation Pipeline
+8. Semantic Indexing Pipeline
+9. GraphRAG Pipeline
+10. Research Intelligence Pipeline
+11. Export Pipeline
+12. Maintenance Pipeline
+
+Each pipeline contains multiple stages.
+
+Pipeline stages contain orchestration only.
+
+Business logic belongs in the Application Layer.
+
+---
+
+# CQRS-lite Design
+
+Pipeline stages never access repositories.
+
+Instead:
+
+Pipeline Stage
+
+↓
+
+Command / Query
+
+↓
+
+Command Bus / Query Bus
+
+↓
+
+Handler
+
+↓
+
+Domain
+
+↓
+
+Repository
+
+↓
+
+Infrastructure
+
+All business behaviour is implemented inside handlers.
+
+---
+
+# Current Implementation Goal
+
+We are **NOT** implementing business logic yet.
+
+We are only implementing:
+
+# STEP A1 — Bootstrap the Project
+
+The goal of this step is to create a professional enterprise-grade project skeleton that will serve as the foundation for every future implementation.
+
+No placeholder code should violate the architecture.
+
+No unnecessary business logic should be added.
+
+Focus on project structure, package organisation, dependency management, development tooling, and bootstrap readiness.
+
+---
+
+# Deliverables
+
+Implement the following.
+
+## 1. Project Structure
+
+Create a complete Python project layout following the agreed architecture.
+
+Suggested top-level layout:
+
+```text
+rkgb/
+
+docs/
+tests/
+
+application/
+domain/
+infrastructure/
+processing/
+pipelines/
+presentation/
+shared/
+
+scripts/
+
+docker/
+
+configs/
+
+examples/
+
+tools/
+
+resources/
+
+pyproject.toml
+README.md
+LICENSE
+.gitignore
+.pre-commit-config.yaml
+docker-compose.yml
+Makefile
+```
+
+Every package should contain appropriate `__init__.py` files.
+
+---
+
+## 2. Processing Package
+
+Create package structure for:
+
+```text
+processing/
+
+pipeline/
+
+runtime/
+
+registry/
+
+plugins/
+
+dsl/
+
+context/
+
+contracts/
+
+execution/
+
+events/
+
+exceptions/
+```
+
+---
+
+## 3. Application Package
+
+Create:
+
+```text
+application/
+
+common/
+
+document_management/
+
+document_extraction/
+
+knowledge_extraction/
+
+entity_resolution/
+
+ontology_mapping/
+
+graph_construction/
+
+graph_validation/
+
+semantic_indexing/
+
+graph_rag/
+
+research_intelligence/
+
+export/
+
+maintenance/
+```
+
+Each feature should already contain empty subpackages:
+
+```text
+commands/
+
+command_handlers/
+
+queries/
+
+query_handlers/
+
+dto/
+
+results/
+
+events/
+
+validators/
+
+policies/
+
+tests/
+```
+
+---
+
+## 4. Domain Package
+
+Create:
+
+```text
+entities/
+
+aggregates/
+
+value_objects/
+
+repositories/
+
+services/
+
+events/
+
+exceptions/
+
+specifications/
+```
+
+---
+
+## 5. Infrastructure Package
+
+Create:
+
+```text
+config/
+
+logging/
+
+database/
+
+neo4j/
+
+storage/
+
+messaging/
+
+security/
+
+cache/
+
+monitoring/
+
+repositories/
+
+pdf/
+
+embeddings/
+
+vector_store/
+
+dependency_injection/
+```
+
+---
+
+## 6. Pipelines Package
+
+Create pipeline folders for:
+
+Document Management
+
+Document Extraction
+
+Knowledge Extraction
+
+Entity Resolution
+
+Ontology Mapping
+
+Knowledge Graph Construction
+
+Graph Validation
+
+Semantic Indexing
+
+GraphRAG
+
+Research Intelligence
+
+Export
+
+Maintenance
+
+Each pipeline should contain:
+
+```text
+pipeline/
+
+stages/
+
+events/
+
+config/
+
+tests/
+```
+
+---
+
+## 7. Shared Package
+
+Create reusable components.
+
+```text
+shared/
+
+constants/
+
+utils/
+
+types/
+
+interfaces/
+
+exceptions/
+
+models/
+```
+
+---
+
+## 8. Documentation
+
+Generate:
+
+README.md
+
+including:
+
+* project vision
+* architecture overview
+* setup instructions
+* package explanation
+* development workflow
+
+Generate:
+
+CONTRIBUTING.md
+
+Generate:
+
+CHANGELOG.md
+
+Generate:
+
+docs/architecture.md
+
+Generate:
+
+docs/project_structure.md
+
+---
+
+## 9. Python Environment
+
+Use
+
+Python 3.12+
+
+Use
+
+pyproject.toml
+
+Configure:
+
+* Ruff
+* Black
+* isort
+* MyPy
+* pytest
+* coverage
+* pre-commit
+
+Use modern tooling only.
+
+Avoid legacy `setup.py`.
+
+---
+
+## 10. Development Tooling
+
+Create:
+
+Makefile
+
+Include commands such as:
+
+* install
+* lint
+* format
+* type-check
+* test
+* run
+* clean
+
+---
+
+## 11. Docker
+
+Create:
+
+Dockerfile
+
+docker-compose.yml
+
+Development environment only.
+
+No production deployment yet.
+
+---
+
+## 12. Testing
+
+Create initial testing structure.
+
+```text
+tests/
+
+unit/
+
+integration/
+
+e2e/
+
+fixtures/
+```
+
+Configure pytest.
+
+---
+
+## 13. Configuration
+
+Create environment support.
+
+Example:
+
+```text
+.env.example
+
+configs/
+
+development.yaml
+
+testing.yaml
+
+production.yaml
+```
+
+Do not implement settings yet.
+
+Only establish the structure.
+
+---
+
+## 14. Logging
+
+Prepare logging package.
+
+Do not implement advanced logging.
+
+Only bootstrap the module structure.
+
+---
+
+## 15. Coding Standards
+
+Use:
+
+* Type hints everywhere
+* Google-style docstrings
+* Dataclasses where appropriate
+* ABCs for interfaces
+* pathlib instead of os.path
+* Dependency Injection
+* Composition over inheritance
+* Async-first where appropriate
+
+Avoid:
+
+* Global state
+* Circular imports
+* Monolithic modules
+* God classes
+* Hidden dependencies
+
+---
+
+# Expected Output
+
+Produce:
+
+1. Complete project directory tree.
+2. All package initialisation files.
+3. Base configuration files.
+4. Tooling configuration.
+5. Bootstrap-ready repository.
+6. Explanation of every major package.
+7. Any assumptions made.
+8. A summary of what remains for Step A2.
+
+Do **not** begin implementing business logic, CQRS buses, repositories, entities, pipelines, or APIs.
+
+The repository should compile, install dependencies successfully, pass initial linting, and provide a clean foundation for future implementation.
+
+Quality, maintainability, and architectural fidelity are more important than speed or file count.

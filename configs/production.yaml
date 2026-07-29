@@ -1,0 +1,25 @@
+# ============================================================
+# RKGB — Production Configuration
+# All sensitive values MUST come from environment variables.
+# This file contains only non-secret structural defaults.
+# ============================================================
+
+app:
+  env: production
+  debug: false
+  host: "0.0.0.0"
+  port: 8000
+
+logging:
+  level: INFO
+  format: json      # Structured JSON for log aggregation
+
+neo4j:
+  database: rkgb
+
+storage:
+  backend: s3       # Configure S3_BUCKET_NAME via env var
+
+cache:
+  backend: redis
+  ttl_seconds: 3600

@@ -1,0 +1,27 @@
+# ============================================================
+# RKGB — Development Configuration
+# Values here are overridden by environment variables.
+# ============================================================
+
+app:
+  env: development
+  debug: true
+  host: "0.0.0.0"
+  port: 8000
+
+logging:
+  level: DEBUG
+  format: console   # console | json
+
+neo4j:
+  uri: "bolt://localhost:7687"
+  database: rkgb
+
+storage:
+  backend: local
+  local_path: "./data/files"
+
+cache:
+  backend: redis
+  url: "redis://localhost:6379/0"
+  ttl_seconds: 300
