@@ -1,24 +1,38 @@
 # ============================================================
 # RKGB — Testing Configuration
 # Used by pytest and CI pipelines.
+# External services are replaced with in-memory stubs.
 # ============================================================
 
-app:
+application:
   env: testing
   debug: true
   host: "127.0.0.1"
   port: 8001
+  reload: false
 
 logging:
   level: WARNING
   format: console
+  suppress_third_party: true
 
 neo4j:
-  uri: "bolt://localhost:7688"   # Separate test DB instance
   database: rkgb_test
 
 storage:
-  backend: memory   # In-memory storage for tests
-
-cache:
   backend: memory
+
+event_bus:
+  backend: in_process
+
+feature_flags:
+  enable_cache: false
+  enable_metrics: false
+  enable_tracing: false
+
+testing:
+  use_in_memory_storage: true
+  use_mock_ai_provider: true
+  use_mock_event_bus: true
+  neo4j_database: rkgb_test
+  max_query_timeout_seconds: 5.0

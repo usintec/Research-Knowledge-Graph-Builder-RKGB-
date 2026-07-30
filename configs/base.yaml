@@ -1,0 +1,57 @@
+# ============================================================
+# RKGB — Base Configuration
+# Loaded first for ALL environments.
+# Override values in the environment-specific YAML file.
+# ============================================================
+
+application:
+  title: "Research Knowledge Graph Builder"
+  version: "0.1.0"
+  workers: 1
+
+logging:
+  level: INFO
+  format: console
+  include_correlation_id: true
+  include_pipeline_id: true
+  suppress_third_party: true
+
+monitoring:
+  health:
+    enabled: true
+    path: "/health"
+
+neo4j:
+  uri: "bolt://localhost:7687"
+  database: "rkgb"
+  pool:
+    max_connection_pool_size: 50
+    connection_acquisition_timeout: 60.0
+  retry:
+    max_retries: 3
+    retry_delay_seconds: 1.0
+
+storage:
+  backend: local
+  local:
+    base_path: "./data/files"
+  max_file_size_mb: 100
+
+event_bus:
+  backend: in_process
+
+feature_flags:
+  enable_cache: true
+  enable_graph_rag: false
+  enable_kafka: false
+  enable_plugin_loader: false
+  enable_metrics: false
+  enable_tracing: false
+  enable_vector_store: false
+  enable_llm_extraction: false
+  enable_embeddings: false
+
+processing:
+  max_parallel_pipelines: 4
+  worker_pool_size: 4
+  default_timeout_seconds: 300.0

@@ -1,25 +1,52 @@
 # ============================================================
 # RKGB — Production Configuration
-# All sensitive values MUST come from environment variables.
-# This file contains only non-secret structural defaults.
+# All sensitive values (passwords, keys) MUST come from
+# environment variables — never hardcoded here.
 # ============================================================
 
-app:
+application:
   env: production
   debug: false
-  host: "0.0.0.0"
-  port: 8000
+  workers: 4
+  reload: false
 
 logging:
   level: INFO
-  format: json      # Structured JSON for log aggregation
+  format: json
+  include_correlation_id: true
+  include_pipeline_id: true
+  suppress_third_party: true
 
 neo4j:
   database: rkgb
+  pool:
+    max_connection_pool_size: 100
+    connection_acquisition_timeout: 30.0
+  retry:
+    max_retries: 5
 
 storage:
-  backend: s3       # Configure S3_BUCKET_NAME via env var
+  backend: s3
+  max_file_size_mb: 500
 
-cache:
-  backend: redis
-  ttl_seconds: 3600
+fastapi:
+  docs:
+    enabled: false   # Disable Swagger UI in production
+  middleware:
+    enable_gzip: true
+    enable_trusted_host: true
+
+security:
+  https_only: true
+  rate_limit_enabled: true
+  rate_limit_requests_per_minute: 120
+
+feature_flags:
+  enable_cache: true
+  enable_metrics: true
+
+monitoring:
+  prometheus:
+    enabled: true
+  health:
+    include_details: false

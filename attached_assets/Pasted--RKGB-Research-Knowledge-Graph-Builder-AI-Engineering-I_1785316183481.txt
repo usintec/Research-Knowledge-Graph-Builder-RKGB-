@@ -1,0 +1,616 @@
+# RKGB (Research Knowledge Graph Builder)
+
+# AI Engineering Implementation Prompt
+
+## Step A2 — Configuration System
+
+You are continuing the implementation of the Research Knowledge Graph Builder (RKGB).
+
+The repository has already been bootstrapped during Step A1.
+
+Do **NOT** redesign the architecture.
+
+Implement only the Configuration System.
+
+The goal is to create a production-grade configuration framework that supports every current and future component of RKGB.
+
+The implementation must be modular, strongly typed, extensible, environment-aware, and dependency-injection friendly.
+
+---
+
+# Architectural Context
+
+RKGB follows the following architecture:
+
+```text
+Presentation Layer
+(API, CLI, Pipelines, Agents, Kafka)
+
+            │
+            ▼
+
+     Processing Engine
+
+            │
+            ▼
+
+     Application Layer
+
+            │
+   ┌────────┴────────┐
+   ▼                 ▼
+Command Bus      Query Bus
+
+   │                 │
+   ▼                 ▼
+Handlers        Query Handlers
+
+            │
+            ▼
+
+       Domain Layer
+
+            │
+            ▼
+
+    Repository Layer
+
+            │
+            ▼
+
+ Infrastructure Layer
+```
+
+The Configuration System belongs to the Infrastructure Layer.
+
+Every layer depends on configuration.
+
+No component should read environment variables directly.
+
+---
+
+# Objectives
+
+Build a centralized Configuration Framework capable of supporting:
+
+* Development
+* Testing
+* Staging
+* Production
+* Local development
+* Docker
+* CI/CD
+* Future Kubernetes deployment
+* Plugin configuration
+* Pipeline configuration
+* AI model configuration
+* Vector database configuration
+* Neo4j configuration
+* Kafka configuration
+* Storage providers
+* Logging
+* Monitoring
+* Feature flags
+
+The design must support future growth without changing existing code.
+
+---
+
+# Design Principles
+
+The Configuration Framework must follow:
+
+* SOLID
+* Clean Architecture
+* Dependency Injection
+* Strong typing
+* Immutable configuration objects
+* Single source of truth
+* Separation of concerns
+* Twelve-Factor App principles
+
+Configuration consumers must never access `.env` files directly.
+
+---
+
+# Configuration Hierarchy
+
+Support configuration precedence similar to enterprise systems.
+
+Lowest priority
+
+Default values
+
+↓
+
+YAML configuration
+
+↓
+
+Environment-specific YAML
+
+↓
+
+Environment variables
+
+↓
+
+Runtime overrides
+
+Highest priority
+
+---
+
+# Required Package Structure
+
+Implement:
+
+```text
+infrastructure/
+
+config/
+
+    __init__.py
+
+    manager.py
+
+    loader.py
+
+    provider.py
+
+    environment.py
+
+    registry.py
+
+    resolver.py
+
+    exceptions.py
+
+    validators.py
+
+    cache.py
+
+    interfaces.py
+
+    constants.py
+
+    bootstrap.py
+
+    models/
+
+    providers/
+
+    schemas/
+
+    tests/
+```
+
+---
+
+# Configuration Models
+
+Create strongly typed configuration models for:
+
+Application
+
+Processing Engine
+
+Pipeline Engine
+
+Neo4j
+
+Storage
+
+Logging
+
+FastAPI
+
+Security
+
+Plugin System
+
+Vector Store
+
+Embeddings
+
+AI Models
+
+Event Bus
+
+Kafka
+
+Docker
+
+Monitoring
+
+Feature Flags
+
+Testing
+
+Each configuration should exist as its own model.
+
+Avoid one giant settings class.
+
+---
+
+# Configuration Providers
+
+Design providers capable of loading configuration from:
+
+Environment variables
+
+YAML
+
+JSON (future)
+
+Secrets Manager (future)
+
+Remote configuration (future)
+
+Database (future)
+
+Plugin manifests
+
+Each provider should implement a common interface.
+
+---
+
+# Configuration Manager
+
+Implement a central Configuration Manager.
+
+Responsibilities:
+
+* Load configuration
+* Merge providers
+* Resolve precedence
+* Validate configuration
+* Cache configuration
+* Expose typed configuration
+* Support dependency injection
+
+Only one Configuration Manager should exist per application instance.
+
+---
+
+# Configuration Registry
+
+Create a registry responsible for:
+
+Registering configuration sections
+
+Resolving configuration by type
+
+Supporting plugins
+
+Version awareness
+
+Lazy loading
+
+Future hot reload support
+
+---
+
+# Configuration Resolver
+
+Implement a resolver responsible for:
+
+Applying overrides
+
+Resolving environment variables
+
+Resolving defaults
+
+Building the final configuration object
+
+---
+
+# Environment Support
+
+Support:
+
+Development
+
+Testing
+
+Production
+
+Local
+
+Docker
+
+CI
+
+Expose an Environment abstraction.
+
+Avoid string literals throughout the project.
+
+---
+
+# Validation
+
+Every configuration section must support validation.
+
+Examples:
+
+Neo4j URI
+
+Storage paths
+
+Required API keys
+
+Port ranges
+
+File locations
+
+Feature dependencies
+
+Validation should fail fast.
+
+---
+
+# Feature Flags
+
+Design a feature flag system.
+
+Examples:
+
+Enable GraphRAG
+
+Enable Kafka
+
+Enable Plugin Loader
+
+Enable Experimental Pipelines
+
+Enable Metrics
+
+Enable Tracing
+
+Feature flags should be injectable.
+
+---
+
+# Plugin Configuration
+
+Plugins should be capable of contributing configuration.
+
+Example:
+
+Plugin
+
+↓
+
+Plugin Configuration
+
+↓
+
+Registry
+
+↓
+
+Configuration Manager
+
+↓
+
+Final Configuration
+
+---
+
+# Pipeline Configuration
+
+Pipelines should support independent configuration.
+
+Examples:
+
+Retry count
+
+Timeout
+
+Parallel execution
+
+Checkpoint interval
+
+Metrics
+
+Pipeline configuration should not be hardcoded.
+
+---
+
+# AI Model Configuration
+
+Support future AI providers.
+
+Examples:
+
+OpenAI
+
+Local Transformers
+
+Sentence Transformers
+
+Ollama
+
+Anthropic
+
+Azure OpenAI
+
+Model configuration must be provider independent.
+
+---
+
+# Vector Database Configuration
+
+Prepare support for:
+
+FAISS
+
+Qdrant
+
+Milvus
+
+Weaviate
+
+Chroma
+
+Pinecone
+
+No implementation is required.
+
+Only the configuration framework.
+
+---
+
+# Neo4j Configuration
+
+Support:
+
+URI
+
+Authentication
+
+Database
+
+Connection pool
+
+Timeout
+
+Retry
+
+TLS
+
+---
+
+# Logging Configuration
+
+Support:
+
+Log level
+
+JSON logging
+
+Console logging
+
+File logging
+
+Correlation IDs
+
+Pipeline IDs
+
+Future OpenTelemetry integration
+
+---
+
+# Bootstrap
+
+Implement a bootstrap module responsible for:
+
+Loading providers
+
+Building the configuration manager
+
+Running validation
+
+Registering configuration
+
+Making configuration available through Dependency Injection
+
+---
+
+# Testing
+
+Create tests for:
+
+Configuration loading
+
+Provider precedence
+
+Validation
+
+Environment switching
+
+Feature flags
+
+Registry
+
+Resolver
+
+Bootstrap
+
+---
+
+# Documentation
+
+Generate:
+
+docs/configuration.md
+
+Include:
+
+Architecture
+
+Configuration lifecycle
+
+Provider hierarchy
+
+Examples
+
+Dependency Injection usage
+
+Environment management
+
+Best practices
+
+---
+
+# Coding Standards
+
+Use:
+
+Python 3.12+
+
+Dataclasses or Pydantic models (justify your choice in comments)
+
+Type hints everywhere
+
+Protocols or ABCs for provider interfaces
+
+Immutable configuration objects where practical
+
+Dependency Injection
+
+Pathlib
+
+Avoid:
+
+Global variables
+
+Singleton anti-patterns
+
+Direct environment access
+
+Magic strings
+
+Hidden dependencies
+
+---
+
+# Expected Deliverables
+
+Produce:
+
+1. Complete configuration package.
+2. Typed configuration models.
+3. Provider architecture.
+4. Configuration Manager.
+5. Registry.
+6. Resolver.
+7. Bootstrap module.
+8. Validation framework.
+9. Feature flag support.
+10. Documentation.
+11. Unit tests.
+12. Summary of assumptions made.
+13. A brief explanation of how this configuration framework integrates with the Dependency Injection container that will be implemented in the next step.
+
+Do **not** implement the Dependency Injection container itself. The configuration system must simply be designed so it can be registered and consumed cleanly once the composition root is introduced.

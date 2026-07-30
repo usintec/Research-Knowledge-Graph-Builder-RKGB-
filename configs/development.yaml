@@ -1,27 +1,43 @@
 # ============================================================
 # RKGB — Development Configuration
-# Values here are overridden by environment variables.
+# Overrides base.yaml for local development environments.
 # ============================================================
 
-app:
+application:
   env: development
   debug: true
   host: "0.0.0.0"
   port: 8000
+  reload: true
 
 logging:
   level: DEBUG
-  format: console   # console | json
+  format: console
+  include_caller: true
 
 neo4j:
   uri: "bolt://localhost:7687"
+  auth:
+    username: neo4j
+    password: devpassword
   database: rkgb
 
 storage:
   backend: local
-  local_path: "./data/files"
+  local:
+    base_path: "./data/files"
+    create_dirs: true
 
-cache:
-  backend: redis
-  url: "redis://localhost:6379/0"
-  ttl_seconds: 300
+fastapi:
+  docs:
+    enabled: true
+  middleware:
+    enable_request_id: true
+    enable_process_time_header: true
+
+feature_flags:
+  enable_cache: false   # Skip Redis in dev by default
+
+monitoring:
+  health:
+    include_details: true
