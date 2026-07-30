@@ -4,7 +4,11 @@ This module bootstraps the RKGB platform.
 
 Step A2 adds configuration system integration.  The ConfigManager is
 bootstrapped during the FastAPI lifespan so all infrastructure components
-receive their configuration via the DI container (Step A3).
+receive their configuration via the DI container (Step A4 — next step).
+
+Step A3 adds the Logging & Observability Framework.  The LoggingManager is
+bootstrapped immediately after config so every subsequent component has access
+to structured, correlated logging.
 """
 
 from __future__ import annotations
@@ -16,9 +20,12 @@ import uvicorn
 from fastapi import FastAPI
 from infrastructure.config.bootstrap import bootstrap_config
 from infrastructure.config.manager import ConfigManager
+from infrastructure.logging.bootstrap import bootstrap_logging
+from infrastructure.logging.manager import LoggingManager
 
-# Module-level reference to the config manager — will be populated during lifespan.
+# Module-level references — populated during lifespan.
 _config_manager: ConfigManager | None = None
+_logging_manager: LoggingManager | None = None
 
 
 def get_config_manager() -> ConfigManager:
@@ -38,9 +45,31 @@ def get_config_manager() -> ConfigManager:
     return _config_manager
 
 
+def get_logging_manager() -> LoggingManager:
+    """Return the active LoggingManager instance.
+
+    Raises:
+        RuntimeError: If called before the application has started.
+
+    Returns:
+        The bootstrapped :class:`~infrastructure.logging.manager.LoggingManager`.
+    """
+    if _logging_manager is None:
+        raise RuntimeError(
+            "LoggingManager is not initialised. "
+            "Ensure the FastAPI lifespan has started before accessing logging."
+        )
+    return _logging_manager
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """FastAPI lifespan — bootstraps and tears down application resources.
+
+    Bootstrap order:
+        1. ConfigManager  — loads and validates all configuration.
+        2. LoggingManager — configures structlog + stdlib from LoggingConfig.
+        3. (Step A4) DI container — wires all infrastructure singletons.
 
     Args:
         app: The FastAPI application instance.
@@ -48,9 +77,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     Yields:
         Control to the running application.
     """
-    global _config_manager  # noqa: PLW0603
+    global _config_manager, _logging_manager  # noqa: PLW0603
 
-    # --- Startup ---
+    # 1. Configuration (Step A2)
     _config_manager = bootstrap_config()
     root = _config_manager.root
 
@@ -59,9 +88,16 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.version = root.application.version
     app.description = root.application.description
 
+    # 2. Logging (Step A3)
+    _logging_manager = bootstrap_logging(_config_manager)
+
     yield
 
-    # --- Shutdown ---
+    # --- Shutdown (reverse order) ---
+    if _logging_manager is not None:
+        _logging_manager.shutdown()
+        _logging_manager = None
+
     _config_manager = None
 
 

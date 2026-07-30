@@ -1,0 +1,476 @@
+# RKGB (Research Knowledge Graph Builder)
+
+# AI Engineering Implementation Prompt
+
+## Step A3 — Logging & Observability Framework (Phase 1)
+
+You are continuing the implementation of the Research Knowledge Graph Builder (RKGB).
+
+The project bootstrap (Step A1) and Configuration System (Step A2) have already been completed.
+
+Do **NOT** redesign the architecture.
+
+Implement only the Logging & Observability Framework (Phase 1).
+
+This is **not** just a logging module.
+
+It is the foundation of the platform's observability strategy.
+
+The framework must be enterprise-grade, structured, extensible, dependency-injection friendly, and capable of supporting future distributed deployments.
+
+---
+
+# Architectural Context
+
+RKGB follows:
+
+```text id="kg4f9d"
+Presentation Layer
+        │
+        ▼
+Processing Engine
+        │
+        ▼
+Application Layer
+        │
+        ▼
+Domain Layer
+        │
+        ▼
+Repository Layer
+        │
+        ▼
+Infrastructure Layer
+```
+
+The Logging Framework belongs to the Infrastructure Layer.
+
+Every other layer depends on it.
+
+No layer should instantiate Python loggers directly.
+
+---
+
+# Objectives
+
+Design a centralized logging framework capable of supporting:
+
+* FastAPI
+* CLI
+* Pipelines
+* Pipeline Manager
+* Command Bus
+* Query Bus
+* Event Bus
+* Neo4j
+* Storage
+* Kafka (future)
+* AI Agents
+* Background Workers
+* Docker
+* CI/CD
+* Future Kubernetes deployment
+
+The framework must support structured logging and future integration with OpenTelemetry.
+
+---
+
+# Design Principles
+
+Follow:
+
+* SOLID
+* Clean Architecture
+* Dependency Injection
+* Single source of logging
+* Structured logging
+* Correlation IDs
+* Traceability
+* Context propagation
+
+Business code should never configure logging directly.
+
+---
+
+# Package Structure
+
+Implement:
+
+```text id="3mu3k8"
+infrastructure/
+
+logging/
+
+    __init__.py
+
+    logger.py
+
+    manager.py
+
+    factory.py
+
+    formatter.py
+
+    handlers.py
+
+    context.py
+
+    correlation.py
+
+    filters.py
+
+    middleware.py
+
+    bootstrap.py
+
+    exceptions.py
+
+    interfaces.py
+
+    constants.py
+
+    models/
+
+    tests/
+```
+
+---
+
+# Logging Manager
+
+Implement a Logging Manager responsible for:
+
+* Creating loggers
+* Applying configuration
+* Registering handlers
+* Managing formatter selection
+* Managing log levels
+* Providing logger instances through Dependency Injection
+
+Only one manager should exist per application instance.
+
+---
+
+# Logger Factory
+
+Implement a Logger Factory responsible for:
+
+* Creating component-specific loggers
+* Applying contextual information
+* Injecting correlation identifiers
+* Returning strongly configured logger instances
+
+Consumers should never create loggers manually.
+
+---
+
+# Structured Logging
+
+All logs must be structured.
+
+Every log entry should support fields such as:
+
+* Timestamp
+* Level
+* Logger name
+* Message
+* Correlation ID
+* Trace ID
+* Pipeline ID
+* Stage ID
+* Execution ID
+* Command name
+* Query name
+* Event name
+* User (future)
+* Plugin (future)
+* Exception details (when applicable)
+
+Design the framework so additional fields can be added without changing business code.
+
+---
+
+# Correlation Context
+
+Implement a context object capable of flowing through the system.
+
+Example:
+
+```text id="8sh4tg"
+Request
+
+↓
+
+Pipeline
+
+↓
+
+Stage
+
+↓
+
+Command
+
+↓
+
+Handler
+
+↓
+
+Repository
+```
+
+Every component should inherit the same Correlation ID.
+
+This enables end-to-end traceability.
+
+---
+
+# Pipeline Context Integration
+
+The Logging Framework must integrate with the existing Pipeline Context.
+
+Every stage execution should automatically log:
+
+* Stage started
+* Stage completed
+* Stage duration
+* Stage failure
+* Retry attempt
+* Checkpoint creation
+
+The pipeline itself should not perform logging logic manually.
+
+---
+
+# Command Bus Integration
+
+Prepare the framework so the future Command Bus can automatically log:
+
+* Command dispatched
+* Handler resolved
+* Handler execution started
+* Handler completed
+* Handler failed
+* Execution duration
+
+No implementation of the Command Bus is required.
+
+Only prepare the logging abstractions.
+
+---
+
+# Query Bus Integration
+
+Prepare support for:
+
+* Query dispatched
+* Query handler resolved
+* Query completed
+* Execution duration
+
+---
+
+# Event Bus Integration
+
+Prepare support for:
+
+* Event published
+* Subscriber invoked
+* Subscriber completed
+* Retry
+* Dead-letter queue (future)
+
+---
+
+# Exception Logging
+
+Implement standardized exception logging.
+
+Capture:
+
+* Exception type
+* Message
+* Stack trace
+* Correlation ID
+* Pipeline ID (if available)
+* Stage ID (if available)
+
+Avoid duplicate exception logs.
+
+---
+
+# Log Levels
+
+Support:
+
+* TRACE (future)
+* DEBUG
+* INFO
+* WARNING
+* ERROR
+* CRITICAL
+
+Log levels should be configurable through the Configuration System implemented in Step A2.
+
+---
+
+# Log Handlers
+
+Prepare handler abstractions for:
+
+* Console
+* File
+* JSON
+* Rotating file
+
+Future support should be possible for:
+
+* Kafka
+* Elasticsearch
+* Loki
+* Cloud logging providers
+
+Do not implement external integrations yet.
+
+---
+
+# Formatters
+
+Provide formatter support for:
+
+* Human-readable development logs
+* Structured JSON logs
+
+Formatter selection should be configuration-driven.
+
+---
+
+# Middleware
+
+Prepare middleware components capable of automatically logging:
+
+* API requests (future)
+* Pipeline execution
+* Command execution
+* Query execution
+* Event publication
+
+Do not implement FastAPI middleware yet.
+
+---
+
+# Metrics Preparation
+
+Although metrics are implemented later, design the framework so logging events can later emit:
+
+* Counters
+* Timers
+* Histograms
+* Execution duration
+
+without redesigning the API.
+
+---
+
+# Testing
+
+Create tests covering:
+
+* Logger creation
+* Structured formatting
+* Correlation propagation
+* Context inheritance
+* Log level filtering
+* Formatter selection
+* Configuration integration
+* Exception logging
+
+---
+
+# Documentation
+
+Generate:
+
+docs/logging.md
+
+Include:
+
+* Architecture
+* Logger lifecycle
+* Correlation flow
+* Structured log format
+* Integration examples
+* Best practices
+* Future OpenTelemetry strategy
+
+---
+
+# Coding Standards
+
+Use:
+
+Python 3.12+
+
+Type hints everywhere
+
+Dependency Injection
+
+Protocols or ABCs where appropriate
+
+Dataclasses for immutable context objects
+
+Pathlib
+
+Avoid:
+
+Global loggers
+
+Manual logger configuration inside business code
+
+Magic strings
+
+Static utility classes
+
+Duplicated logging logic
+
+---
+
+# Future Compatibility
+
+Design the framework so it can later integrate seamlessly with:
+
+* OpenTelemetry
+* Prometheus
+* Grafana
+* Jaeger
+* Loki
+* Elastic Stack
+* Kafka
+* Kubernetes
+* Distributed tracing
+
+These integrations are **not** part of this implementation.
+
+Only ensure the architecture supports them cleanly.
+
+---
+
+# Expected Deliverables
+
+Produce:
+
+1. Complete logging package.
+2. Logging Manager.
+3. Logger Factory.
+4. Structured logging framework.
+5. Correlation Context model.
+6. Formatter architecture.
+7. Handler abstractions.
+8. Logging bootstrap module.
+9. Unit tests.
+10. `docs/logging.md`.
+11. Explanation of how the Logging Framework integrates with the Configuration System from Step A2.
+12. A brief explanation of how the Logging Framework will later integrate with the Dependency Injection container and Pipeline Context.
+
+Do **not** implement the Dependency Injection container, Command Bus, Query Bus, Event Bus, or OpenTelemetry integration. The framework should simply be architected so these components can plug into it without modification.
