@@ -1,1 +1,0 @@
-"""RKGB application package."""
