@@ -1,0 +1,20 @@
+{
+  "name": "@rkgb/common",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.11"
+  }
+}

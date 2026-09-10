@@ -1,0 +1,1 @@
+- [pnpm toolchain](pnpm-toolchain.md) — keep the workspace package manager aligned with the pnpm version already available in the environment.
