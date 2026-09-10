@@ -1,0 +1,550 @@
+# RKGB (Research Knowledge Graph Builder)
+
+# AI Engineering Implementation Prompt
+
+## Step A4 — Dependency Injection & Composition Root
+
+You are continuing the implementation of the Research Knowledge Graph Builder (RKGB).
+
+The following implementation steps have already been completed:
+
+* Step A1 — Project Bootstrap
+* Step A2 — Configuration System
+* Step A3 — Logging & Observability Framework
+
+Do **NOT** redesign the architecture.
+
+Implement only the Dependency Injection Framework and the Composition Root.
+
+This step establishes the object creation, dependency wiring, lifecycle management, and service registration strategy for the entire platform.
+
+No business logic should be implemented.
+
+---
+
+# Architectural Context
+
+RKGB follows:
+
+```text
+Presentation Layer
+
+↓
+
+Processing Engine
+
+↓
+
+Application Layer
+
+↓
+
+Domain Layer
+
+↓
+
+Repository Layer
+
+↓
+
+Infrastructure Layer
+```
+
+The Dependency Injection Framework belongs to the Infrastructure Layer but serves the entire application.
+
+Every component should receive its dependencies through constructor injection.
+
+No component should instantiate its own dependencies.
+
+---
+
+# Objectives
+
+Build a Dependency Injection Framework capable of managing:
+
+* Configuration Manager
+* Logging Manager
+* Command Bus
+* Query Bus
+* Event Bus
+* Pipeline Manager
+* Stage Registry
+* Plugin Registry
+* Repository implementations
+* Storage providers
+* Neo4j
+* Vector stores
+* AI providers
+* FastAPI
+* CLI
+* Background workers
+
+The framework must support future scalability without architectural changes.
+
+---
+
+# Design Principles
+
+Follow:
+
+* SOLID
+* Dependency Inversion Principle
+* Constructor Injection
+* Clean Architecture
+* Composition Root
+* Explicit dependencies
+* Interface-first design
+* Testability
+* Replaceability
+* Lifetime management
+
+Avoid:
+
+* Service Locator anti-pattern
+* Global singletons
+* Hidden dependencies
+* Static utility containers
+* Circular dependency resolution
+
+---
+
+# Composition Root
+
+The Composition Root is the only place where concrete implementations are created.
+
+Responsibilities:
+
+* Load configuration
+* Initialize logging
+* Build repositories
+* Build infrastructure services
+* Register application services
+* Register buses
+* Register pipeline infrastructure
+* Register plugins
+* Validate registrations
+* Produce the root service provider
+
+No other module should manually instantiate infrastructure components.
+
+---
+
+# Package Structure
+
+Implement:
+
+```text
+infrastructure/
+
+dependency_injection/
+
+    __init__.py
+
+    container.py
+
+    service_provider.py
+
+    service_collection.py
+
+    registration.py
+
+    composition_root.py
+
+    bootstrap.py
+
+    lifetimes.py
+
+    interfaces.py
+
+    decorators.py
+
+    exceptions.py
+
+    validators.py
+
+    discovery.py
+
+    modules/
+
+    tests/
+```
+
+---
+
+# Service Collection
+
+Implement a Service Collection responsible for:
+
+* Registering services
+* Registering implementations
+* Registering factories
+* Registering configuration
+* Registering plugins
+* Registering pipeline modules
+
+The Service Collection should only describe registrations.
+
+It should not resolve objects.
+
+---
+
+# Service Provider
+
+Implement a Service Provider responsible for:
+
+* Resolving services
+* Constructing object graphs
+* Injecting dependencies
+* Managing service lifetimes
+* Detecting circular dependencies
+* Throwing meaningful resolution exceptions
+
+The Service Provider becomes the runtime container.
+
+---
+
+# Container
+
+Implement the central Dependency Injection Container.
+
+Responsibilities:
+
+* Hold registrations
+* Build providers
+* Resolve dependencies
+* Manage object lifetimes
+* Support constructor injection
+* Support interface bindings
+* Support factory registrations
+
+---
+
+# Service Lifetimes
+
+Support three lifetimes.
+
+Singleton
+
+One instance for the application lifetime.
+
+Examples:
+
+* Configuration Manager
+* Logging Manager
+* Command Bus
+* Query Bus
+* Event Bus
+* Plugin Registry
+
+Scoped
+
+One instance per execution scope.
+
+Examples:
+
+* Pipeline Context
+* Request Context
+* Correlation Context
+
+Transient
+
+New instance every resolution.
+
+Examples:
+
+* Command Handlers
+* Query Handlers
+* Validators
+* Policies
+
+The framework should allow future lifetime expansion.
+
+---
+
+# Registration Modules
+
+Support modular registration.
+
+Examples:
+
+```text
+modules/
+
+configuration_module.py
+
+logging_module.py
+
+repository_module.py
+
+processing_module.py
+
+application_module.py
+
+pipeline_module.py
+
+plugin_module.py
+```
+
+Each module should register only its own services.
+
+---
+
+# Automatic Discovery
+
+Implement optional service discovery.
+
+The framework should be capable of automatically discovering:
+
+* Command Handlers
+* Query Handlers
+* Pipeline Stages
+* Plugins
+* Validators
+
+Discovery should be extensible and configurable.
+
+---
+
+# Constructor Injection
+
+Support constructor injection.
+
+Example:
+
+```text
+ValidateDocumentHandler
+
+↓
+
+DocumentRepository
+
+↓
+
+Logger
+
+↓
+
+Configuration
+```
+
+The handler should receive all dependencies automatically.
+
+No manual object creation inside handlers.
+
+---
+
+# Interface Registration
+
+Support interface-based registration.
+
+Example:
+
+```text
+DocumentRepository
+
+↓
+
+Neo4jDocumentRepository
+```
+
+Consumers depend on interfaces rather than concrete implementations.
+
+---
+
+# Factory Registration
+
+Support factories for services requiring runtime construction.
+
+Examples:
+
+* AI model providers
+* Vector store clients
+* Storage providers
+
+Factories should integrate naturally with the container.
+
+---
+
+# Pipeline Integration
+
+The Processing Engine should receive dependencies through the container.
+
+Examples:
+
+* Pipeline Manager
+* Execution Planner
+* Stage Registry
+* Event Publisher
+* Checkpoint Manager
+
+No pipeline component should instantiate infrastructure objects.
+
+---
+
+# CQRS Integration
+
+Prepare registrations for:
+
+* Command Bus
+* Query Bus
+* Command Handlers
+* Query Handlers
+
+Do not implement the buses yet.
+
+Only register the abstractions and placeholders necessary for future integration.
+
+---
+
+# Plugin Integration
+
+Plugins should be able to register:
+
+* Services
+* Configuration
+* Pipeline Stages
+* Event Subscribers
+* Repositories
+
+The Composition Root should expose extension points for plugins.
+
+---
+
+# Scope Management
+
+Design execution scopes for:
+
+* HTTP requests (future)
+* Pipeline execution
+* CLI execution
+* Scheduled jobs
+* Kafka messages
+
+Each scope should isolate scoped services while sharing singleton services.
+
+---
+
+# Validation
+
+Implement startup validation.
+
+Validate:
+
+* Duplicate registrations
+* Missing dependencies
+* Circular dependencies
+* Invalid lifetimes
+* Missing implementations
+
+The application should fail fast during startup.
+
+---
+
+# Testing
+
+Create tests covering:
+
+* Registration
+* Resolution
+* Constructor injection
+* Lifetime behaviour
+* Scope isolation
+* Factory registration
+* Circular dependency detection
+* Missing service detection
+
+---
+
+# Documentation
+
+Generate:
+
+docs/dependency_injection.md
+
+Include:
+
+* Architecture
+* Object lifecycle
+* Service lifetimes
+* Registration process
+* Constructor injection
+* Scope management
+* Composition Root
+* Best practices
+* Extension points
+
+---
+
+# Coding Standards
+
+Use:
+
+Python 3.12+
+
+Type hints everywhere
+
+Protocols or ABCs for abstractions
+
+Constructor injection only
+
+Dataclasses where appropriate
+
+Pathlib
+
+Dependency Injection
+
+Avoid:
+
+Service Locator
+
+Global state
+
+Module-level singletons
+
+Manual dependency creation
+
+Reflection-heavy solutions
+
+Hidden dependencies
+
+---
+
+# Future Compatibility
+
+Design the framework to support future integration with:
+
+* FastAPI dependency injection
+* Celery workers
+* Kafka consumers
+* Airflow operators
+* Plugin ecosystem
+* GraphQL
+* gRPC
+* OpenTelemetry
+* Distributed execution
+
+These integrations are not part of this implementation.
+
+Only ensure the architecture supports them cleanly.
+
+---
+
+# Expected Deliverables
+
+Produce:
+
+1. Complete dependency injection package.
+2. Dependency Injection Container.
+3. Service Collection.
+4. Service Provider.
+5. Composition Root.
+6. Registration Modules.
+7. Lifetime management.
+8. Constructor injection framework.
+9. Automatic discovery infrastructure.
+10. Startup validation.
+11. Unit tests.
+12. `docs/dependency_injection.md`.
+13. Explanation of how the Composition Root integrates with the Configuration System (Step A2), Logging Framework (Step A3), Processing Engine, Application Layer, and future Command Bus, Query Bus, Event Bus, and Plugin Architecture.
+
+Do **not** implement the Command Bus, Query Bus, Event Bus, repositories, business handlers, pipelines, or APIs. This step is solely responsible for creating the dependency wiring and lifecycle management framework that the rest of the platform will build upon.
