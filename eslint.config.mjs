@@ -4,7 +4,14 @@ import tsPlugin from '@typescript-eslint/eslint-plugin';
 
 export default [
   {
-    ignores: ['**/dist/**', '**/node_modules/**', '**/.cache/**', '.local/**'],
+    ignores: [
+      '**/dist/**',
+      '**/node_modules/**',
+      '**/.cache/**',
+      '**/coverage/**',
+      '.local/**',
+      '.pythonlibs/**',
+    ],
   },
   eslint.configs.recommended,
   {
@@ -13,11 +20,15 @@ export default [
       parser: tsParser,
       globals: {
         AbortSignal: 'readonly',
+        Buffer: 'readonly',
         console: 'readonly',
         describe: 'readonly',
         expect: 'readonly',
         fetch: 'readonly',
         it: 'readonly',
+        jest: 'readonly',
+        NodeJS: 'readonly',
+        performance: 'readonly',
         process: 'readonly',
       },
       parserOptions: {

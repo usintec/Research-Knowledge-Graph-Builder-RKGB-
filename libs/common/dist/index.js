@@ -9,8 +9,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CommonHttpExceptionFilter = exports.StructuredLogger = exports.CorrelationIdMiddleware = void 0;
+exports.HealthCheckRegistry = exports.DependencyUnavailableError = exports.ConfigurationError = exports.RkgbError = exports.CommonHttpExceptionFilter = exports.StructuredLogger = exports.CorrelationIdMiddleware = void 0;
 exports.createHealthController = createHealthController;
+exports.requiredEnv = requiredEnv;
+exports.envString = envString;
+exports.envNumber = envNumber;
+exports.envBoolean = envBoolean;
+exports.validateRequiredConfig = validateRequiredConfig;
 const common_1 = require("@nestjs/common");
 const node_crypto_1 = require("node:crypto");
 function createHealthController(serviceName) {
@@ -108,4 +113,125 @@ exports.CommonHttpExceptionFilter = CommonHttpExceptionFilter;
 exports.CommonHttpExceptionFilter = CommonHttpExceptionFilter = __decorate([
     (0, common_1.Catch)()
 ], CommonHttpExceptionFilter);
+class RkgbError extends Error {
+    code;
+    statusCode;
+    details;
+    constructor(message, code, statusCode = 500, details) {
+        super(message);
+        this.code = code;
+        this.statusCode = statusCode;
+        this.details = details;
+        this.name = 'RkgbError';
+    }
+}
+exports.RkgbError = RkgbError;
+class ConfigurationError extends RkgbError {
+    constructor(message, details) {
+        super(message, 'CONFIGURATION_ERROR', 500, details);
+        this.name = 'ConfigurationError';
+    }
+}
+exports.ConfigurationError = ConfigurationError;
+class DependencyUnavailableError extends RkgbError {
+    constructor(dependency, details) {
+        super(`${dependency} is unavailable`, 'DEPENDENCY_UNAVAILABLE', 503, details);
+        this.name = 'DependencyUnavailableError';
+    }
+}
+exports.DependencyUnavailableError = DependencyUnavailableError;
+function requiredEnv(name, source = process.env) {
+    const value = source[name]?.trim();
+    if (!value) {
+        throw new ConfigurationError(`Missing required environment variable: ${name}`, {
+            variable: name,
+        });
+    }
+    return value;
+}
+function envString(name, fallback, source = process.env) {
+    return source[name]?.trim() || fallback;
+}
+function envNumber(name, fallback, source = process.env) {
+    const raw = source[name];
+    if (raw === undefined || raw.trim() === '') {
+        return fallback;
+    }
+    const value = Number(raw);
+    if (!Number.isFinite(value)) {
+        throw new ConfigurationError(`Environment variable ${name} must be a number`, {
+            variable: name,
+            value: raw,
+        });
+    }
+    return value;
+}
+function envBoolean(name, fallback, source = process.env) {
+    const raw = source[name]?.trim().toLowerCase();
+    if (!raw) {
+        return fallback;
+    }
+    if (['1', 'true', 'yes', 'on'].includes(raw)) {
+        return true;
+    }
+    if (['0', 'false', 'no', 'off'].includes(raw)) {
+        return false;
+    }
+    throw new ConfigurationError(`Environment variable ${name} must be boolean`, {
+        variable: name,
+        value: raw,
+    });
+}
+function validateRequiredConfig(values, required) {
+    const missing = required.filter((key) => values[key] === undefined || values[key] === '');
+    if (missing.length > 0) {
+        throw new ConfigurationError(`Missing required configuration: ${missing.join(', ')}`, {
+            missing,
+        });
+    }
+}
+class HealthCheckRegistry {
+    checks = new Map();
+    register(name, check) {
+        if (this.checks.has(name)) {
+            throw new ConfigurationError(`Health check already registered: ${name}`, { name });
+        }
+        this.checks.set(name, check);
+        return this;
+    }
+    async run() {
+        const results = [];
+        for (const [name, check] of this.checks) {
+            const startedAt = performance.now();
+            try {
+                await check();
+                results.push({
+                    name,
+                    status: 'up',
+                    checkedAt: new Date().toISOString(),
+                    latencyMs: Math.round((performance.now() - startedAt) * 100) / 100,
+                });
+            }
+            catch (error) {
+                results.push({
+                    name,
+                    status: 'down',
+                    checkedAt: new Date().toISOString(),
+                    latencyMs: Math.round((performance.now() - startedAt) * 100) / 100,
+                    message: error instanceof Error ? error.message : 'Health check failed',
+                });
+            }
+        }
+        return results;
+    }
+    async readiness() {
+        const checks = await this.run();
+        return {
+            status: checks.every((check) => check.status === 'up') ? 'ready' : 'not_ready',
+            checkedAt: new Date().toISOString(),
+            checks,
+        };
+    }
+}
+exports.HealthCheckRegistry = HealthCheckRegistry;
 //# sourceMappingURL=index.js.map

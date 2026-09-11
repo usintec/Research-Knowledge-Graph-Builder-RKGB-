@@ -27,4 +27,42 @@ export declare class StructuredLogger implements LoggerService {
 export declare class CommonHttpExceptionFilter implements ExceptionFilter {
     catch(exception: unknown, host: ArgumentsHost): void;
 }
+export type ErrorDetails = Record<string, unknown>;
+export declare class RkgbError extends Error {
+    readonly code: string;
+    readonly statusCode: number;
+    readonly details?: ErrorDetails | undefined;
+    constructor(message: string, code: string, statusCode?: number, details?: ErrorDetails | undefined);
+}
+export declare class ConfigurationError extends RkgbError {
+    constructor(message: string, details?: ErrorDetails);
+}
+export declare class DependencyUnavailableError extends RkgbError {
+    constructor(dependency: string, details?: ErrorDetails);
+}
+export declare function requiredEnv(name: string, source?: NodeJS.ProcessEnv): string;
+export declare function envString(name: string, fallback: string, source?: NodeJS.ProcessEnv): string;
+export declare function envNumber(name: string, fallback: number, source?: NodeJS.ProcessEnv): number;
+export declare function envBoolean(name: string, fallback: boolean, source?: NodeJS.ProcessEnv): boolean;
+export declare function validateRequiredConfig(values: Record<string, string | number | boolean | undefined>, required: readonly string[]): void;
+export interface HealthCheckResult {
+    name: string;
+    status: 'up' | 'down';
+    checkedAt: string;
+    latencyMs: number;
+    message?: string;
+    details?: Record<string, unknown>;
+}
+export type HealthCheck = () => Promise<void> | void;
+export interface ReadinessReport {
+    status: 'ready' | 'not_ready';
+    checkedAt: string;
+    checks: HealthCheckResult[];
+}
+export declare class HealthCheckRegistry {
+    private readonly checks;
+    register(name: string, check: HealthCheck): this;
+    run(): Promise<HealthCheckResult[]>;
+    readiness(): Promise<ReadinessReport>;
+}
 //# sourceMappingURL=index.d.ts.map

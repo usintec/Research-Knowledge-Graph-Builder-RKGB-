@@ -7,5 +7,15 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@rkgb/common": "workspace:*",
+    "ioredis": "^5.6.1",
+    "minio": "^8.0.5",
+    "neo4j-driver": "^6.0.1",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.15.5"
   }
 }

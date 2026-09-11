@@ -7,5 +7,10 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@rkgb/common": "workspace:*",
+    "@rkgb/events": "workspace:*",
+    "kafkajs": "^2.2.4"
   }
 }
