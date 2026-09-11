@@ -1,1 +1,2 @@
 - [pnpm toolchain](pnpm-toolchain.md) — keep the workspace package manager aligned with the pnpm version already available in the environment.
+- [GitHub push authentication](github-push-auth.md) — this workspace may require Basic auth headers for Git pushes even when bearer API auth succeeds.
